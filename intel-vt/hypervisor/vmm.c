@@ -272,19 +272,35 @@ void initialize_logical_processor(void* guest_rsp)
 		return;
 	}
 
+	vcpu->vmstatus.vmx_on = 1;
+
 	if (!NT_SUCCESS(setup_vmcs(vcpu, guest_rsp)))
 	{
 		log_error("failed to setup vmcs\n");
 		return;
 	}
+	vcpu->vmstatus.vmm_launched = 1;
 
-	if (__vmx_vmlaunch() != 0)
-	{
-		UINT64 FailureCode;
-		__vmx_vmread(VMCS_VM_INSTRUCTION_ERROR, &FailureCode);
-		DbgPrintEx(0, 0, "vm launch: 0x%llx\n", FailureCode);
-	}
 
+	__vmx_vmlaunch();
+
+	vcpu->vmstatus.vmx_on = 0;
+	vcpu->vmstatus.vmm_launched = 0;
 
 	__vmx_off();
+}
+
+unsigned __int64 vmxoff_find_rsp()
+{
+	return vmm_context->vcpu_table[KeGetCurrentProcessorNumber()]->vmxoff.guest_rsp;
+}
+
+unsigned __int64 vmxoff_find_rip()
+{
+	return vmm_context->vcpu_table[KeGetCurrentProcessorNumber()]->vmxoff.guest_rip;
+}
+
+vcpu_t* vmm_find_vcpu(unsigned __int32 processor_number)
+{
+	return vmm_context->vcpu_table[processor_number];
 }

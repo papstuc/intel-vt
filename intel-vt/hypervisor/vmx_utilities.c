@@ -1,8 +1,8 @@
 #include "vmx_utilities.h"
-
 #include "vmx_intrin.h"
-
 #include "ia32.h"
+
+#include <intrin.h>
 
 unsigned __int32 read_segment_access_rights(unsigned __int16 segment)
 {
@@ -40,4 +40,11 @@ unsigned __int64 read_segment_base(unsigned __int64 gdt_base, unsigned __int16 s
     }
 
     return segment_base;
+}
+
+unsigned __int64 vmread(unsigned __int64 vmcs_field)
+{
+    unsigned __int64 value = 0;
+    __vmx_vmread(vmcs_field, &value);
+    return value;
 }

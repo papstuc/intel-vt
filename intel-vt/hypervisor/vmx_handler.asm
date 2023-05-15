@@ -2,6 +2,8 @@
 
 extern initialize_logical_processor : proc
 extern vmexit_handler : proc
+extern vmxoff_find_rsp : proc
+extern vmxoff_find_rip : proc
 
 SAVE_GP macro
         push    rax

@@ -228,10 +228,10 @@ NTSTATUS setup_vmcs(vcpu_t* vcpu, void* guest_rsp)
 
 	__vmx_vmwrite(VMCS_CTRL_VIRTUAL_PROCESSOR_IDENTIFIER, 1);
 
-	unsigned __int64 code = 0;
-	__vmx_vmread(VMCS_VM_INSTRUCTION_ERROR, &code);
+	unsigned __int64 error_code = 0;
+	__vmx_vmread(VMCS_VM_INSTRUCTION_ERROR, &error_code);
 	
-	status = code == 0 ? STATUS_SUCCESS : STATUS_UNSUCCESSFUL;
+	status = error_code == 0 ? STATUS_SUCCESS : STATUS_UNSUCCESSFUL;
 
 	return status;
 }
