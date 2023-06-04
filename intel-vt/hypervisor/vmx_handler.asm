@@ -45,7 +45,7 @@ vmx_launch_cpu  proc
 	    vmwrite rcx, rsp
 
 	    mov     rcx, 0681Eh
-	    lea     rdx, done
+	    lea     rdx, vm_launched
 	    vmwrite rcx, rdx
 	    vmlaunch
 
@@ -54,7 +54,7 @@ vmx_launch_cpu  proc
 
 	    popfq
 	    ret
-done:
+vm_launched:
 	    popfq
 	    mov     rax, 0DEADBEEFh
 	    ret
