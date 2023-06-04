@@ -6,5 +6,4 @@
 #include "vmexit.h"
 
 void vmx_entrypoint();
-void vmx_save_state();
-void vmx_restore_state();
+unsigned __int32 vmx_launch_cpu();

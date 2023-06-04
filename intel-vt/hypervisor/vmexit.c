@@ -7,20 +7,24 @@
 #include <intrin.h>
 #include <ntddk.h>
 
-static void adjust_rip(vcpu_t* cpu)
-{
-	unsigned __int64 instruction_length = vmread(VMCS_VMEXIT_INSTRUCTION_LENGTH);
-	cpu->vmexit.guest_rip += instruction_length;
-	__vmx_vmwrite(VMCS_GUEST_RIP, cpu->vmexit.guest_rip);
-}
-
 unsigned __int8 vmexit_handler(vmexit_guest_registers_t* guest_registers)
 {
-	UNREFERENCED_PARAMETER(guest_registers);
+    DbgBreakPoint();
+    UNREFERENCED_PARAMETER(guest_registers);
 
-	__debugbreak();
+    unsigned __int64 ExitReason = 0;
+    __vmx_vmread(VMCS_EXIT_REASON, &ExitReason);
 
-	//vcpu_t* vcpu = vmm_find_vcpu(KeGetCurrentProcessorNumber());
+    unsigned __int64 ExitQualification = 0;
+    __vmx_vmread(VMCS_EXIT_QUALIFICATION, &ExitQualification);
 
-	return 1;
+    DbgPrintEx(0, 0, "VM_EXIT_REASION 0x%x\n", ExitReason & 0xffff);
+    DbgPrintEx(0, 0, "EXIT_QUALIFICATION 0x%x\n", ExitQualification);
+
+    ULONG64 ErrorCode = 0;
+    __vmx_vmread(VMCS_VM_INSTRUCTION_ERROR, &ErrorCode);
+    __vmx_off();
+    DbgPrintEx(0, 0, "[*] VMRESUME Error : 0x%llx\n", ErrorCode);
+
+    return 1;
 }

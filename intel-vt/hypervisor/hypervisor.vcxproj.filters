@@ -88,11 +88,11 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="vmx_intrin.asm">
+    <MASM Include="vmx_intrin.asm">
       <Filter>Source Files</Filter>
-    </None>
-    <None Include="vmx_handler.asm">
+    </MASM>
+    <MASM Include="vmx_handler.asm">
       <Filter>Source Files</Filter>
-    </None>
+    </MASM>
   </ItemGroup>
 </Project>

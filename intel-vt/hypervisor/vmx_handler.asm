@@ -1,9 +1,6 @@
-.code
-
-extern initialize_logical_processor : proc
 extern vmexit_handler : proc
-extern vmxoff_find_rsp : proc
-extern vmxoff_find_rip : proc
+
+.code
 
 SAVE_GP macro
         push    rax
@@ -41,25 +38,52 @@ RESTORE_GP macro
         pop     rax
 endm
 
+vmx_launch_cpu  proc
+	    pushfq
+        
+        mov     rcx, 0681Ch
+	    vmwrite rcx, rsp
+
+	    mov     rcx, 0681Eh
+	    lea     rdx, done
+	    vmwrite rcx, rdx
+	    vmlaunch
+
+	    pushfq
+	    pop     rax
+
+	    popfq
+	    ret
+done:
+	    popfq
+	    mov     rax, 0DEADBEEFh
+	    ret
+vmx_launch_cpu  endp
+
 vmx_entrypoint  proc
         SAVE_GP
+
         sub     rsp, 68h
+
         movaps  xmmword ptr [rsp +  0h], xmm0
         movaps  xmmword ptr [rsp + 10h], xmm1
         movaps  xmmword ptr [rsp + 20h], xmm2
         movaps  xmmword ptr [rsp + 30h], xmm3
         movaps  xmmword ptr [rsp + 40h], xmm4
         movaps  xmmword ptr [rsp + 50h], xmm5
+
         mov     rcx, rsp
         sub     rsp, 20h
         call    vmexit_handler
         add     rsp, 20h
+
         movaps  xmm0, xmmword ptr [rsp +  0h]
         movaps  xmm1, xmmword ptr [rsp + 10h]
         movaps  xmm2, xmmword ptr [rsp + 20h]
         movaps  xmm3, xmmword ptr [rsp + 30h]
         movaps  xmm4, xmmword ptr [rsp + 40h]
         movaps  xmm5, xmmword ptr [rsp + 50h]
+
         add     rsp, 68h
         test    al, al
         jz      exit
@@ -78,22 +102,7 @@ exit:
         ret
 vmerror:
         int     3
+
 vmx_entrypoint   endp
-
-vmx_save_state   proc
-    pushfq
-    SAVE_GP
-    sub     rsp, 020h
-    mov     rcx, rsp
-    call    initialize_logical_processor
-    int     3
-vmx_save_state   endp
-
-vmx_restore_state   proc
-    add     rsp, 020h
-	RESTORE_GP
-    popfq
-	ret
-vmx_restore_state   endp
 
 end

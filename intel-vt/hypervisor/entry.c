@@ -67,6 +67,6 @@ NTSTATUS driver_entry(PDRIVER_OBJECT driver_object, PUNICODE_STRING registry_pat
 		log_error("failed to initialize vmm!\n");
 		return status;
 	}
-
+	
 	return status;
 }

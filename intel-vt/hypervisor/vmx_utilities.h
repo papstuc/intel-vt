@@ -1,6 +1,7 @@
 #pragma once
 
-unsigned __int32 read_segment_access_rights(unsigned __int16 segment);
-unsigned __int64 read_segment_base(unsigned __int64 gdt_base, unsigned __int16 segment);
+#include "ia32.h"
+#include "sdm.h"
 
-unsigned __int64 vmread(unsigned __int64 vmcs_field);
+segment_information_t find_segment_information(segment_descriptor_register_64* gdtr, unsigned __int16 segment);
+unsigned __int32 adjust_control_value(unsigned __int32 vmx_capability, unsigned __int64 value);

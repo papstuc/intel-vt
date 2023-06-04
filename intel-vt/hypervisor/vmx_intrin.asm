@@ -48,14 +48,4 @@ no_error:
             ret
 __load_ar endp
 
-__sgdt      proc
-    sgdt    qword ptr [rcx]
-    ret
-__sgdt      endp
-
-__sidt      proc
-    sidt    qword ptr [rcx]
-    ret
-__sidt      endp
-
 end
