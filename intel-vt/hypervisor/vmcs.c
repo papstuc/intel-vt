@@ -30,8 +30,8 @@ static NTSTATUS setup_host(segment_descriptor_register_64* gdtr, segment_descrip
 	__vmx_vmwrite(VMCS_HOST_CR3, ((eprocess_t*)PsInitialSystemProcess)->pcb.directory_table_base);
 	__vmx_vmwrite(VMCS_HOST_CR4, __readcr4());
 
-	__vmx_vmwrite(VMCS_HOST_RSP, host_rip);
-	__vmx_vmwrite(VMCS_HOST_RIP, host_rsp);
+	__vmx_vmwrite(VMCS_HOST_RSP, host_rsp);
+	__vmx_vmwrite(VMCS_HOST_RIP, host_rip);
 
 	segment_information_t es = find_segment_information(gdtr, __read_es());
 	segment_information_t cs = find_segment_information(gdtr, __read_cs());
@@ -40,14 +40,6 @@ static NTSTATUS setup_host(segment_descriptor_register_64* gdtr, segment_descrip
 	segment_information_t fs = find_segment_information(gdtr, __read_fs());
 	segment_information_t gs = find_segment_information(gdtr, __read_gs());
 	segment_information_t tr = find_segment_information(gdtr, __read_tr());
-
-	__vmx_vmwrite(VMCS_HOST_ES_SELECTOR, es.selector.flags & 0xF8);
-	__vmx_vmwrite(VMCS_HOST_CS_SELECTOR, cs.selector.flags & 0xF8);
-	__vmx_vmwrite(VMCS_HOST_SS_SELECTOR, ss.selector.flags & 0xF8);
-	__vmx_vmwrite(VMCS_HOST_DS_SELECTOR, ds.selector.flags & 0xF8);
-	__vmx_vmwrite(VMCS_HOST_FS_SELECTOR, fs.selector.flags & 0xF8);
-	__vmx_vmwrite(VMCS_HOST_GS_SELECTOR, gs.selector.flags & 0xF8);
-	__vmx_vmwrite(VMCS_HOST_TR_SELECTOR, tr.selector.flags & 0xF8);
 
 	__vmx_vmwrite(VMCS_HOST_FS_BASE, __readmsr(IA32_FS_BASE));
 	__vmx_vmwrite(VMCS_HOST_GS_BASE, __readmsr(IA32_GS_BASE));
@@ -59,6 +51,14 @@ static NTSTATUS setup_host(segment_descriptor_register_64* gdtr, segment_descrip
 	__vmx_vmwrite(VMCS_HOST_SYSENTER_ESP, __readmsr(IA32_SYSENTER_ESP));
 	__vmx_vmwrite(VMCS_HOST_SYSENTER_EIP, __readmsr(IA32_SYSENTER_EIP));
 
+	__vmx_vmwrite(VMCS_HOST_ES_SELECTOR, es.selector.flags & 0xF8);
+	__vmx_vmwrite(VMCS_HOST_CS_SELECTOR, cs.selector.flags & 0xF8);
+	__vmx_vmwrite(VMCS_HOST_SS_SELECTOR, ss.selector.flags & 0xF8);
+	__vmx_vmwrite(VMCS_HOST_DS_SELECTOR, ds.selector.flags & 0xF8);
+	__vmx_vmwrite(VMCS_HOST_FS_SELECTOR, fs.selector.flags & 0xF8);
+	__vmx_vmwrite(VMCS_HOST_GS_SELECTOR, gs.selector.flags & 0xF8);
+	__vmx_vmwrite(VMCS_HOST_TR_SELECTOR, tr.selector.flags & 0xF8);
+
 	unsigned __int64 error_code = 0;
 	__vmx_vmread(VMCS_VM_INSTRUCTION_ERROR, &error_code);
 	return (error_code == 0) ? STATUS_SUCCESS : STATUS_UNSUCCESSFUL;
@@ -66,23 +66,16 @@ static NTSTATUS setup_host(segment_descriptor_register_64* gdtr, segment_descrip
 
 static NTSTATUS setup_guest(segment_descriptor_register_64* gdtr, segment_descriptor_register_64* idtr)
 {
+	UNREFERENCED_PARAMETER(idtr);
 	__vmx_vmwrite(VMCS_GUEST_CR0, __readcr0());
 	__vmx_vmwrite(VMCS_GUEST_CR3, __readcr3());
 	__vmx_vmwrite(VMCS_GUEST_CR4, __readcr4());
 	__vmx_vmwrite(VMCS_GUEST_DR7, __readdr(7));
+
 	__vmx_vmwrite(VMCS_GUEST_RSP, 0);
 	__vmx_vmwrite(VMCS_GUEST_RIP, 0);
+
 	__vmx_vmwrite(VMCS_GUEST_RFLAGS, __readeflags());
-
-	__vmx_vmwrite(VMCS_GUEST_SYSENTER_CS, __readmsr(IA32_SYSENTER_CS));
-	__vmx_vmwrite(VMCS_GUEST_SYSENTER_ESP, __readmsr(IA32_SYSENTER_ESP));
-	__vmx_vmwrite(VMCS_GUEST_SYSENTER_EIP, __readmsr(IA32_SYSENTER_EIP));
-	__vmx_vmwrite(VMCS_GUEST_DEBUGCTL, __readmsr(IA32_DEBUGCTL));
-
-	__vmx_vmwrite(VMCS_GUEST_VMCS_LINK_POINTER, MAXULONG64);
-	__vmx_vmwrite(VMCS_GUEST_INTERRUPTIBILITY_STATE, 0);
-	__vmx_vmwrite(VMCS_GUEST_ACTIVITY_STATE, 0);
-	__vmx_vmwrite(VMCS_GUEST_PENDING_DEBUG_EXCEPTIONS, 0);
 
 	segment_information_t es = find_segment_information(gdtr, __read_es());
 	segment_information_t cs = find_segment_information(gdtr, __read_cs());
@@ -99,8 +92,19 @@ static NTSTATUS setup_guest(segment_descriptor_register_64* gdtr, segment_descri
 	__vmx_vmwrite(VMCS_GUEST_DS_SELECTOR, ds.selector.flags);
 	__vmx_vmwrite(VMCS_GUEST_FS_SELECTOR, fs.selector.flags);
 	__vmx_vmwrite(VMCS_GUEST_GS_SELECTOR, gs.selector.flags);
-	__vmx_vmwrite(VMCS_GUEST_TR_SELECTOR, tr.selector.flags);
+	__vmx_vmwrite(VMCS_GUEST_TR_SELECTOR,tr.selector.flags);
 	__vmx_vmwrite(VMCS_GUEST_LDTR_SELECTOR, ldtr.selector.flags);
+
+	__vmx_vmwrite(VMCS_GUEST_ES_LIMIT, es.limit);
+	__vmx_vmwrite(VMCS_GUEST_CS_LIMIT, cs.limit);
+	__vmx_vmwrite(VMCS_GUEST_SS_LIMIT, ss.limit);
+	__vmx_vmwrite(VMCS_GUEST_DS_LIMIT, ds.limit);
+	__vmx_vmwrite(VMCS_GUEST_FS_LIMIT, fs.limit);
+	__vmx_vmwrite(VMCS_GUEST_GS_LIMIT, gs.limit);
+	__vmx_vmwrite(VMCS_GUEST_TR_LIMIT, tr.limit);
+	__vmx_vmwrite(VMCS_GUEST_LDTR_LIMIT, ldtr.limit);
+	__vmx_vmwrite(VMCS_GUEST_GDTR_LIMIT, gdtr->limit);
+	__vmx_vmwrite(VMCS_GUEST_IDTR_LIMIT, idtr->limit);
 
 	__vmx_vmwrite(VMCS_GUEST_ES_ACCESS_RIGHTS, es.access_rights.flags);
 	__vmx_vmwrite(VMCS_GUEST_CS_ACCESS_RIGHTS, cs.access_rights.flags);
@@ -111,18 +115,6 @@ static NTSTATUS setup_guest(segment_descriptor_register_64* gdtr, segment_descri
 	__vmx_vmwrite(VMCS_GUEST_TR_ACCESS_RIGHTS, tr.access_rights.flags);
 	__vmx_vmwrite(VMCS_GUEST_LDTR_ACCESS_RIGHTS, ldtr.access_rights.flags);
 
-	__vmx_vmwrite(VMCS_GUEST_ES_LIMIT, es.limit);
-	__vmx_vmwrite(VMCS_GUEST_CS_LIMIT, cs.limit);
-	__vmx_vmwrite(VMCS_GUEST_SS_LIMIT, ss.limit);
-	__vmx_vmwrite(VMCS_GUEST_DS_LIMIT, ds.limit);
-	__vmx_vmwrite(VMCS_GUEST_FS_LIMIT, fs.limit);
-	__vmx_vmwrite(VMCS_GUEST_GS_LIMIT, gs.limit);
-	__vmx_vmwrite(VMCS_GUEST_TR_LIMIT, tr.limit);
-	__vmx_vmwrite(VMCS_GUEST_LDTR_LIMIT, ldtr.limit);
-
-	__vmx_vmwrite(VMCS_GUEST_GDTR_LIMIT, gdtr->limit);
-	__vmx_vmwrite(VMCS_GUEST_IDTR_LIMIT, idtr->limit);
-
 	__vmx_vmwrite(VMCS_GUEST_ES_BASE, es.base_address);
 	__vmx_vmwrite(VMCS_GUEST_CS_BASE, cs.base_address);
 	__vmx_vmwrite(VMCS_GUEST_SS_BASE, ss.base_address);
@@ -131,9 +123,18 @@ static NTSTATUS setup_guest(segment_descriptor_register_64* gdtr, segment_descri
 	__vmx_vmwrite(VMCS_GUEST_GS_BASE, __readmsr(IA32_GS_BASE));
 	__vmx_vmwrite(VMCS_GUEST_TR_BASE, tr.base_address);
 	__vmx_vmwrite(VMCS_GUEST_LDTR_BASE, ldtr.base_address);
-
 	__vmx_vmwrite(VMCS_GUEST_GDTR_BASE, gdtr->base_address);
 	__vmx_vmwrite(VMCS_GUEST_IDTR_BASE, idtr->base_address);
+
+	__vmx_vmwrite(VMCS_GUEST_SYSENTER_CS, __readmsr(IA32_SYSENTER_CS));
+	__vmx_vmwrite(VMCS_GUEST_SYSENTER_ESP, __readmsr(IA32_SYSENTER_ESP));
+	__vmx_vmwrite(VMCS_GUEST_SYSENTER_EIP, __readmsr(IA32_SYSENTER_EIP));
+	__vmx_vmwrite(VMCS_GUEST_DEBUGCTL, __readmsr(IA32_DEBUGCTL));
+
+	__vmx_vmwrite(VMCS_GUEST_VMCS_LINK_POINTER, MAXULONG64);
+	__vmx_vmwrite(VMCS_GUEST_INTERRUPTIBILITY_STATE, 0);
+	__vmx_vmwrite(VMCS_GUEST_ACTIVITY_STATE, 0);
+	__vmx_vmwrite(VMCS_GUEST_PENDING_DEBUG_EXCEPTIONS, 0);
 
 	unsigned __int64 error_code = 0;
 	__vmx_vmread(VMCS_VM_INSTRUCTION_ERROR, &error_code);

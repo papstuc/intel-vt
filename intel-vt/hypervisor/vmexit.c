@@ -21,10 +21,5 @@ unsigned __int8 vmexit_handler(vmexit_guest_registers_t* guest_registers)
     DbgPrintEx(0, 0, "VM_EXIT_REASION 0x%x\n", ExitReason & 0xffff);
     DbgPrintEx(0, 0, "EXIT_QUALIFICATION 0x%x\n", ExitQualification);
 
-    ULONG64 ErrorCode = 0;
-    __vmx_vmread(VMCS_VM_INSTRUCTION_ERROR, &ErrorCode);
-    __vmx_off();
-    DbgPrintEx(0, 0, "[*] VMRESUME Error : 0x%llx\n", ErrorCode);
-
     return 1;
 }

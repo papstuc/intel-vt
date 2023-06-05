@@ -46,12 +46,10 @@ segment_information_t find_segment_information(segment_descriptor_register_64* g
 {
     segment_information_t segment_information = { 0 };
 
-	segment_selector segment_selector = { segment };
-
-	segment_information.selector = segment_selector;
-	segment_information.access_rights = find_segment_access_rights(segment_selector);
-	segment_information.limit = __segmentlimit(segment_selector.flags);
-	segment_information.base_address = find_segment_base(gdtr, segment_selector);
+	segment_information.selector.flags = segment;
+	segment_information.access_rights = find_segment_access_rights(segment_information.selector);
+	segment_information.limit = __segmentlimit(segment_information.selector.flags);
+	segment_information.base_address = find_segment_base(gdtr, segment_information.selector);
 
     return segment_information;
 }
