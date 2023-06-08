@@ -66,7 +66,6 @@ static NTSTATUS setup_host(segment_descriptor_register_64* gdtr, segment_descrip
 
 static NTSTATUS setup_guest(segment_descriptor_register_64* gdtr, segment_descriptor_register_64* idtr)
 {
-	UNREFERENCED_PARAMETER(idtr);
 	__vmx_vmwrite(VMCS_GUEST_CR0, __readcr0());
 	__vmx_vmwrite(VMCS_GUEST_CR3, __readcr3());
 	__vmx_vmwrite(VMCS_GUEST_CR4, __readcr4());
@@ -158,13 +157,10 @@ static NTSTATUS setup_controls()
 	exit_ctls.flags = adjust_control_value(basic_msr.vmx_controls ? IA32_VMX_TRUE_EXIT_CTLS : IA32_VMX_EXIT_CTLS, exit_ctls.flags);
 
 	ia32_vmx_procbased_ctls_register primary_ctls = { 0 };
-	primary_ctls.use_msr_bitmaps = 1;
 	primary_ctls.activate_secondary_controls = 1;
-	primary_ctls.hlt_exiting = 1;
 	primary_ctls.flags = adjust_control_value(basic_msr.vmx_controls ? IA32_VMX_TRUE_PROCBASED_CTLS : IA32_VMX_PROCBASED_CTLS, primary_ctls.flags);
 
 	ia32_vmx_procbased_ctls2_register secondary_ctls = { 0 };
-	secondary_ctls.flags = 0;
 	secondary_ctls.enable_rdtscp = 1;
 	secondary_ctls.enable_invpcid = 1;
 	secondary_ctls.enable_xsaves = 1;

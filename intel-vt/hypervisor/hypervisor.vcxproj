@@ -94,6 +94,7 @@
   <ItemGroup>
     <ClCompile Include="dispatch.c" />
     <ClCompile Include="entry.c" />
+    <ClCompile Include="interrupt.c" />
     <ClCompile Include="log.c" />
     <ClCompile Include="vmcs.c" />
     <ClCompile Include="vmexit.c" />
@@ -104,6 +105,7 @@
   <ItemGroup>
     <ClInclude Include="dispatch.h" />
     <ClInclude Include="ia32.h" />
+    <ClInclude Include="interrupt.h" />
     <ClInclude Include="log.h" />
     <ClInclude Include="ntapi.h" />
     <ClInclude Include="sdm.h" />

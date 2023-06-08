@@ -18,7 +18,6 @@ static void initialize_logical_processor()
 	unsigned __int64 processor_number = KeGetCurrentProcessorNumber();
 	vcpu_t* vcpu = &vmm_context.vcpu_table[processor_number];
 
-	DbgBreakPoint();
 	vmx_enable();
 
 	unsigned __int64 vmxon_physical = MmGetPhysicalAddress(&vcpu->vmxon).QuadPart;
@@ -39,7 +38,7 @@ static void initialize_logical_processor()
 		unsigned __int64 vmxerror;
 		__vmx_vmread(VMCS_VM_INSTRUCTION_ERROR, &vmxerror);
 
-		log_error("vmxerror: %d\n", vmxerror);
+		log_error("vmerror: %d\n", vmxerror);
 		__vmx_off();
 
 		vmx_disable();
@@ -97,7 +96,6 @@ NTSTATUS initialize_vmm()
 	}
 
 	log_success("allocated %u vcpus with %u bytes at 0x%x", vmm_context.processor_count, array_size, vmm_context.vcpu_table);
-	DbgBreakPoint();
 	KeIpiGenericCall((PKIPI_BROADCAST_WORKER)&initialize_logical_processor, 0);
 
 	return STATUS_SUCCESS;

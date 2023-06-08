@@ -48,6 +48,9 @@
     <ClCompile Include="vmexit.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="interrupt.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="log.h">
@@ -84,6 +87,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="vmexit.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="interrupt.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
