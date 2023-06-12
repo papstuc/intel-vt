@@ -2,8 +2,6 @@
 
 #include "ia32.h"
 
-#include <intrin.h>
-
 void _sgdt(segment_descriptor_register_64* gdtr);
 void _lgdt(segment_descriptor_register_64* gdtr);
 

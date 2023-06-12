@@ -28,7 +28,7 @@ static void handle_cpuid(vmexit_guest_registers_t* guest_registers)
     guest_registers->rdx = regs[3];
 }
 
-static unsigned __int8 handle_xsetbv(vmexit_guest_registers_t* guest_registers)
+static NTSTATUS handle_xsetbv(vmexit_guest_registers_t* guest_registers)
 {
     unsigned __int64 msr_value = ((unsigned __int64)guest_registers->edx << 32) | guest_registers->eax;
 
@@ -39,13 +39,13 @@ static unsigned __int8 handle_xsetbv(vmexit_guest_registers_t* guest_registers)
     __except (EXCEPTION_EXECUTE_HANDLER)
     {
         inject_interrupt(HARDWARE_EXCEPTION, GENERAL_PROTECTION, 0);
-        return 0;
+        return STATUS_UNSUCCESSFUL;
     }
 
-    return 1;
+    return STATUS_SUCCESS;
 }
 
-static unsigned __int8 handle_rdmsr(vmexit_guest_registers_t* guest_registers)
+static NTSTATUS handle_rdmsr(vmexit_guest_registers_t* guest_registers)
 {
     __try
     {
@@ -57,13 +57,13 @@ static unsigned __int8 handle_rdmsr(vmexit_guest_registers_t* guest_registers)
     __except (EXCEPTION_EXECUTE_HANDLER)
     {
         inject_interrupt(HARDWARE_EXCEPTION, GENERAL_PROTECTION, 0);
-        return 0;
+        return STATUS_UNSUCCESSFUL;
     }
 
-    return 1;
+    return STATUS_SUCCESS;
 }
 
-static unsigned __int8 handle_wrmsr(vmexit_guest_registers_t* guest_registers)
+static NTSTATUS handle_wrmsr(vmexit_guest_registers_t* guest_registers)
 {
     unsigned __int64 msr_value = ((unsigned __int64)guest_registers->edx << 32) | guest_registers->eax;
 
@@ -74,10 +74,10 @@ static unsigned __int8 handle_wrmsr(vmexit_guest_registers_t* guest_registers)
     __except (EXCEPTION_EXECUTE_HANDLER)
     {
         inject_interrupt(HARDWARE_EXCEPTION, GENERAL_PROTECTION, 0);
-        return 0;
+        return STATUS_UNSUCCESSFUL;
     }
 
-    return 1;
+    return STATUS_SUCCESS;
 }
 
 void vmexit_handler(vmexit_guest_registers_t* guest_registers)
@@ -99,7 +99,7 @@ void vmexit_handler(vmexit_guest_registers_t* guest_registers)
             break;
 
         case VMX_EXIT_REASON_EXECUTE_XSETBV:
-            if (handle_xsetbv(guest_registers))
+            if (NT_SUCCESS(handle_xsetbv(guest_registers)))
             {
                 adjust_rip();
             }
@@ -107,7 +107,7 @@ void vmexit_handler(vmexit_guest_registers_t* guest_registers)
             break;
         
         case VMX_EXIT_REASON_EXECUTE_RDMSR:
-            if (handle_rdmsr(guest_registers))
+            if (NT_SUCCESS(handle_rdmsr(guest_registers)))
             {
                 adjust_rip();
             }
@@ -115,10 +115,23 @@ void vmexit_handler(vmexit_guest_registers_t* guest_registers)
             break;
 
         case VMX_EXIT_REASON_EXECUTE_WRMSR:
-            if (handle_wrmsr(guest_registers))
+            if (NT_SUCCESS(handle_wrmsr(guest_registers)))
             {
                 adjust_rip();
             }
+
+            break;
+
+        case VMX_EXIT_REASON_EXECUTE_RDTSCP:
+            break;
+
+        case VMX_EXIT_REASON_EXECUTE_INVPCID:
+            break;
+
+        case VMX_EXIT_REASON_EXECUTE_XSAVES:
+            break;
+
+        case VMX_EXIT_REASON_EXECUTE_XRSTORS:
             break;
 
         case VMX_EXIT_REASON_EXECUTE_INVEPT:

@@ -60,7 +60,7 @@ vmx_launch_cpu  endp
 vmx_entrypoint  proc
         SAVE_GP
         sub     rsp, 108h
-        movaps  xmmword ptr [rsp +  0h], xmm0
+        movaps  xmmword ptr [rsp +   0h], xmm0
         movaps  xmmword ptr [rsp + 010h], xmm1
         movaps  xmmword ptr [rsp + 020h], xmm2
         movaps  xmmword ptr [rsp + 030h], xmm3
@@ -80,16 +80,16 @@ vmx_entrypoint  proc
         sub     rsp, 20h
         call    vmexit_handler
         add     rsp, 20h
-        movaps  xmm0, xmmword ptr [rsp +  0h]
-        movaps  xmm1, xmmword ptr [rsp + 010h]
-        movaps  xmm2, xmmword ptr [rsp + 020h]
-        movaps  xmm3, xmmword ptr [rsp + 030h]
-        movaps  xmm4, xmmword ptr [rsp + 040h]
-        movaps  xmm5, xmmword ptr [rsp + 050h]
-        movaps  xmm6, xmmword ptr [rsp + 060h]
-        movaps  xmm7, xmmword ptr [rsp + 070h]
-        movaps  xmm8, xmmword ptr [rsp + 080h]
-        movaps  xmm9, xmmword ptr [rsp + 090h]
+        movaps  xmm0, xmmword ptr  [rsp +   0h]
+        movaps  xmm1, xmmword ptr  [rsp + 010h]
+        movaps  xmm2, xmmword ptr  [rsp + 020h]
+        movaps  xmm3, xmmword ptr  [rsp + 030h]
+        movaps  xmm4, xmmword ptr  [rsp + 040h]
+        movaps  xmm5, xmmword ptr  [rsp + 050h]
+        movaps  xmm6, xmmword ptr  [rsp + 060h]
+        movaps  xmm7, xmmword ptr  [rsp + 070h]
+        movaps  xmm8, xmmword ptr  [rsp + 080h]
+        movaps  xmm9, xmmword ptr  [rsp + 090h]
         movaps  xmm10, xmmword ptr [rsp + 0A0h]
         movaps  xmm11, xmmword ptr [rsp + 0B0h]
         movaps  xmm12, xmmword ptr [rsp + 0C0h]
