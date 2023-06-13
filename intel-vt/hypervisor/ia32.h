@@ -1,4 +1,3 @@
-/** @file */
 #pragma once
 
 #if defined(_MSC_EXTENSIONS)
@@ -25489,4 +25488,3 @@ typedef union
 #if defined(_MSC_EXTENSIONS)
 #pragma warning(pop)
 #endif
-
